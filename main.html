@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI人格问卷 - 心苑心理协会</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cae;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .logo-container {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .questionnaire-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .result-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .question {
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .question.active {
+            display: block;
+        }
+        
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background-color: var(--light-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            background-color: #e2e6ea;
+        }
+        
+        .option input {
+            margin-right: 1rem;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5a8c;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .outline-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .outline-item {
+            padding: 0.5rem 1rem;
+            background-color: var(--light-color);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .outline-item.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .outline-item.current {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .result-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .result-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 1rem 0;
+            border: 5px solid var(--primary-color);
+        }
+        
+        .result-description {
+            margin-top: 1rem;
+            text-align: left;
+            line-height: 1.8;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .options {
+                gap: 0.5rem;
+            }
+            
+            .option {
+                padding: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="images/LOGO.jpg" alt="心苑心理协会LOGO" class="logo-img">
+        </div>
+        <h1>MBTI人格问卷</h1>
+        <p>探索你的性格类型，了解真实的自己</p>
+    </header>
+    
+    <div class="container">
+        <!-- 欢迎部分 -->
+        <section class="welcome-section" id="welcome">
+            <h2>欢迎参加MBTI人格测试</h2>
+            <p>欢迎您前来测试！</p>
+            <p>本问卷将帮助您了解自己的MBTI人格类型，共包含20个问题，大约需要5-10分钟完成。</p>
+            <button class="btn-primary" id="start-btn">开始测试</button>
+        </section>
+        
+        <!-- 问卷部分 -->
+        <section class="questionnaire-section" id="questionnaire">
+            <h2>MBTI人格问卷</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            
+            <div class="outline-nav" id="outline-nav">
+                <!-- 大纲导航将通过JavaScript动态生成 -->
+            </div>
+            
+            <div id="questions-container">
+                <!-- 问题将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-secondary" id="prev-btn">上一题</button>
+                <button class="btn-primary" id="next-btn">下一题</button>
+            </div>
+        </section>
+        
+        <!-- 结果部分 -->
+        <section class="result-section" id="result">
+            <div class="result-card">
+                <h2>您的MBTI人格类型是: <span id="result-type"></span></h2>
+                <img id="result-image" class="result-image" src="" alt="人格类型图片">
+                <div class="result-description" id="result-description"></div>
+                <button class="btn-primary" id="restart-btn">重新测试</button>
+            </div>
+        </section>
+    </div>
+    
+    <footer class="footer">
+        <p>© 2023 心苑心理协会 | MBTI人格问卷</p>
+    </footer>
+    
+    <script>
+        // 问题和答案选项
+        const questions = [
+            "您更喜欢参加热闹的聚会而不是独自阅读",
+            "您在做决定时更依赖逻辑而不是个人价值观",
+            "您经常被描述为有组织且喜欢按计划行事的人",
+            "您倾向于关注现实细节而不是未来可能性",
+            "您发现与陌生人交谈很自然且愉快",
+            "您认为公平比同情更重要",
+            "您更喜欢明确的目标而不是开放式的选择",
+            "您更相信经验而不是直觉",
+            "您在社交场合中通常感到精力充沛",
+            "您更可能批评别人而不是鼓励他们",
+            "您的工作空间通常整洁有序",
+            "您更关注当前实际而不是未来想象",
+            "您喜欢成为关注的焦点",
+            "您在做决定时更注重客观标准而非个人考虑",
+            "您喜欢按部就班而不是即兴发挥",
+            "您更信任经过验证的方法而不是新想法",
+            "您认为自己是外向而非内向的人",
+            "您更看重正义而不是仁慈",
+            "您喜欢提前制定详细的计划",
+            "您更倾向于使用已知的解决方案而不是尝试新方法"
+        ];
+        
+        // MBTI人格类型描述和图片
+        const mbtiTypes = {
+            "ISTJ": {
+                description: "ISTJ型人格是认真负责的务实者，他们实际、有条理、注重细节，尊重事实并遵循传统。他们喜欢有秩序的环境，重视责任和义务，是可靠和值得信赖的人。",
+                image: "istj.jpg"
+            },
+            "ISFJ": {
+                description: "ISFJ型人格是温暖体贴的保护者，他们安静、友善、有责任感，关心他人的感受并乐于提供实际帮助。他们重视和谐与稳定，是忠诚和勤勉的伙伴。",
+                image: "isfj.jpg"
+            },
+            "INFJ": {
+                description: "INFJ型人格是富有洞察力的理想主义者，他们深思熟虑、富有同情心，关注人类潜能和意义。他们有强烈的价值观和直觉，致力于实现自己的愿景。",
+                image: "infj.jpg"
+            },
+            "INTJ": {
+                description: "INTJ型人格是富有想象力的战略家，他们独立、创新、逻辑性强，善于制定长期计划并实现目标。他们重视能力，追求知识和效率。",
+                image: "intj.jpg"
+            },
+            "ISTP": {
+                description: "ISTP型人格是大胆实际的探索者，他们灵活、冷静、善于分析，喜欢动手解决问题。他们活在当下，享受冒险和刺激，是危机处理的高手。",
+                image: "istp.jpg"
+            },
+            "ISFP": {
+                description: "ISFP型人格是温和敏感的艺术家，他们安静、友善、敏感，享受当下并欣赏美。他们重视个人自由，行动符合自己的价值观，不喜欢冲突。",
+                image: "isfp.jpg"
+            },
+            "INFP": {
+                description: "INFP型人格是富有同情心的理想主义者，他们理想主义、忠诚于自己的价值观，关心个人成长和发展。他们富有创造力，寻求生活的意义和真实性。",
+                image: "infp.jpg"
+            },
+            "INTP": {
+                description: "INTP型人格是逻辑创新的思想家，他们分析性强、好奇心重，喜欢理论和抽象思维。他们重视知识，不断追求理解世界的基本原理。",
+                image: "intp.jpg"
+            },
+            "ESTP": {
+                description: "ESTP型人格是精力充沛的问题解决者，他们外向、实际、行动导向，享受即时结果。他们灵活应变，喜欢冒险和刺激，善于处理危机。",
+                image: "estp.jpg"
+            },
+            "ESFP": {
+                description: "ESFP型人格是热情活泼的表演者，他们外向、友好、接受力强，喜欢与他人分享经验。他们活在当下，享受生活的乐趣，为周围带来欢乐。",
+                image: "esfp.jpg"
+            },
+            "ENFP": {
+                description: "ENFP型人格是热情富有想象力的激励者，他们充满热情、创造力强，能够看到可能性并建立联系。他们乐观向上，喜欢鼓励他人，追求有意义的生活。",
+                image: "enfp.jpg"
+            },
+            "ENTP": {
+                description: "ENTP型人格是聪明好奇的发明家，他们思维敏捷、创新、善于战略思考，喜欢智力挑战。他们善于看到各种可能性，喜欢辩论和探索新想法。",
+                image: "entp.jpg"
+            },
+            "ESTJ": {
+                description: "ESTJ型人格是高效实际的组织者，他们实际、现实、果断，喜欢组织和领导活动。他们重视传统和秩序，善于制定系统和程序来实现目标。",
+                image: "estj.jpg"
+            },
+            "ESFJ": {
+                description: "ESFJ型人格是关心他人的照顾者，他们热心、合作、和谐，关心他人的需求。他们重视传统和社会规范，喜欢为他人提供实际帮助和支持。",
+                image: "esfj.jpg"
+            },
+            "ENFJ": {
+                description: "ENFJ型人格是富有魅力的领导者，他们热情、同理心强、有说服力，关注他人的潜能。他们善于激励和团结他人，致力于促进个人和集体的成长。",
+                image: "enfj.jpg"
+            },
+            "ENTJ": {
+                description: "ENTJ型人格是大胆果断的指挥官，他们外向、果断、战略思维强，善于组织和领导。他们重视效率和能力，喜欢挑战并实现长期目标。",
+                image: "entj.jpg"
+            }
+        };
+        
+        // DOM元素
+        const welcomeSection = document.getElementById('welcome');
+        const questionnaireSection = document.getElementById('questionnaire');
+        const resultSection = document.getElementById('result');
+        const startBtn = document.getElementById('start-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const questionsContainer = document.getElementById('questions-container');
+        const outlineNav = document.getElementById('outline-nav');
+        const progressBar = document.getElementById('progress');
+        const resultType = document.getElementById('result-type');
+        const resultImage = document.getElementById('result-image');
+        const resultDescription = document.getElementById('result-description');
+        
+        // 变量
+        let currentQuestion = 0;
+        let answers = [];
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            generateQuestions();
+            generateOutlineNav();
+            showQuestion(currentQuestion);
+        });
+        
+        // 事件监听器
+        startBtn.addEventListener('click', startQuestionnaire);
+        prevBtn.addEventListener('click', prevQuestion);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuestionnaire);
+        
+        // 函数
+        function startQuestionnaire() {
+            welcomeSection.style.display = 'none';
+            questionnaireSection.style.display = 'block';
+        }
+        
+        function generateQuestions() {
+            const options = ["完全符合", "大致符合", "不清楚(或中立)", "基本不符合", "完全不符合"];
+            
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = `question ${index === 0 ? 'active' : ''}`;
+                questionDiv.id = `question-${index}`;
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = `问题${index + 1}: ${question}`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                options.forEach((option, optionIndex) => {
+                    const optionDiv = document.createElement('label');
+                    optionDiv.className = 'option';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = optionIndex;
+                    input.addEventListener('change', function() {
+                        answers[index] = optionIndex;
+                        updateOutlineNav();
+                    });
+                    
+                    optionDiv.appendChild(input);
+                    optionDiv.appendChild(document.createTextNode(option));
+                    optionsDiv.appendChild(optionDiv);
+                });
+                
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionsContainer.appendChild(questionDiv);
+                
+                // 初始化答案数组
+                answers[index] = -1;
+            });
+        }
+        
+        function generateOutlineNav() {
+            questions.forEach((_, index) => {
+                const outlineItem = document.createElement('div');
+                outlineItem.className = 'outline-item';
+                outlineItem.textContent = index + 1;
+                outlineItem.addEventListener('click', function() {
+                    if (answers[index] !== -1 || index <= currentQuestion) {
+                        showQuestion(index);
+                    }
+                });
+                outlineNav.appendChild(outlineItem);
+            });
+        }
+        
+        function updateOutlineNav() {
+            const outlineItems = outlineNav.querySelectorAll('.outline-item');
+            
+            outlineItems.forEach((item, index) => {
+                item.classList.remove('completed', 'current');
+                
+                if (answers[index] !== -1) {
+                    item.classList.add('completed');
+                }
+                
+                if (index === currentQuestion) {
+                    item.classList.add('current');
+                }
+            });
+            
+            // 更新进度条
+            const answeredCount = answers.filter(a => a !== -1).length;
+            const progressPercent = (answeredCount / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+        }
+        
+        function showQuestion(index) {
+            // 隐藏所有问题
+            document.querySelectorAll('.question').forEach(q => {
+                q.classList.remove('active');
+            });
+            
+            // 显示当前问题
+            document.getElementById(`question-${index}`).classList.add('active');
+            currentQuestion = index;
+            
+            // 更新导航按钮状态
+            prevBtn.disabled = index === 0;
+            
+            if (index === questions.length - 1) {
+                nextBtn.textContent = '查看结果';
+            } else {
+                nextBtn.textContent = '下一题';
+            }
+            
+            updateOutlineNav();
+        }
+        
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+        
+        function nextQuestion() {
+            if (answers[currentQuestion] === -1) {
+                alert('请选择一个答案后再继续');
+                return;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                calculateResult();
+            }
+        }
+        
+        function calculateResult() {
+            // 简化的MBTI计算逻辑
+            // E/I维度 (问题0,4,8,12,16)
+            const eiScore = (answers[0] + answers[4] + answers[8] + answers[12] + answers[16]) / 5;
+            const eiType = eiScore < 2.5 ? "I" : "E";
+            
+            // S/N维度 (问题3,7,11,15,19)
+            const snScore = (answers[3] + answers[7] + answers[11] + answers[15] + answers[19]) / 5;
+            const snType = snScore < 2.5 ? "S" : "N";
+            
+            // T/F维度 (问题1,5,9,13,17)
+            const tfScore = (answers[1] + answers[5] + answers[9] + answers[13] + answers[17]) / 5;
+            const tfType = tfScore < 2.5 ? "T" : "F";
+            
+            // J/P维度 (问题2,6,10,14,18)
+            const jpScore = (answers[2] + answers[6] + answers[10] + answers[14] + answers[18]) / 5;
+            const jpType = jpScore < 2.5 ? "J" : "P";
+            
+            const mbtiType = eiType + snType + tfType + jpType;
+            
+            // 显示结果
+            showResult(mbtiType);
+        }
+        
+        function showResult(type) {
+            questionnaireSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            
+            resultType.textContent = type;
+            resultDescription.textContent = mbtiTypes[type].description;
+            
+            // 在实际应用中，这里应该使用正确的图片路径
+            resultImage.src = `images/${mbtiTypes[type].image}`;
+            resultImage.alt = `${type}人格类型图片`;
+        }
+        
+        function restartQuestionnaire() {
+            // 重置答案
+            answers = questions.map(() => -1);
+            currentQuestion = 0;
+            
+            // 重置单选按钮
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
+            // 重置进度条
+            progressBar.style.width = '0%';
+            
+            // 重置大纲导航
+            const outlineItems = outlineNav.querySelectorAll('.outline-item');
+            outlineItems.forEach(item => {
+                item.classList.remove('completed', 'current');
+            });
+            outlineItems[0].classList.add('current');
+            
+            // 回到欢迎页面
+            resultSection.style.display = 'none';
+            welcomeSection.style.display = 'block';
+            
+            // 显示第一个问题
+            showQuestion(currentQuestion);
+        }
+    </script>
+</body>
+</html>
