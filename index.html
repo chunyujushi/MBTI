@@ -270,7 +270,7 @@
         <section class="welcome-section" id="welcome">
             <h2>欢迎参加MBTI人格测试</h2>
             <p>欢迎您前来测试！</p>
-            <p>本问卷将帮助您了解自己的MBTI人格类型，共包含20个问题，大约需要5-10分钟完成。</p>
+            <p>本问卷将帮助您了解自己的MBTI人格类型，共包含28个问题，大约需要5-10分钟完成。</p>
             <button class="btn-primary" id="start-btn">开始测试</button>
         </section>
         
@@ -305,6 +305,7 @@
             </div>
         </section>
     </div>
+    
     <footer class="footer">
         <p>© 2025 心苑心理协会 | MBTI人格问卷</p>
     </footer>
@@ -316,22 +317,30 @@
             "您在做决定时更依赖逻辑而不是个人价值观",
             "您经常被描述为有组织且喜欢按计划行事的人",
             "您倾向于关注现实细节而不是未来可能性",
-            "您发现与陌生人交谈很自然且愉快",
-            "您认为公平比同情更重要",
-            "您更喜欢明确的目标而不是开放式的选择",
-            "您更相信经验而不是直觉",
-            "您在社交场合中通常感到精力充沛",
-            "您更可能批评别人而不是鼓励他们",
-            "您的工作空间通常整洁有序",
-            "您更关注当前实际而不是未来想象",
-            "您喜欢成为关注的焦点",
-            "您在做决定时更注重客观标准而非个人考虑",
-            "您喜欢按部就班而不是即兴发挥",
-            "您更信任经过验证的方法而不是新想法",
-            "您认为自己是外向而非内向的人",
-            "您更看重正义而不是仁慈",
-            "您喜欢提前制定详细的计划",
-            "您更倾向于使用已知的解决方案而不是尝试新方法"
+            "您发现与陌生人交谈很自然且愉快", 
+            "您认为公平比同情更重要", 
+            "您更喜欢明确的目标而不是开放式的选择", 
+            "您更相信经验而不是直觉", 
+            "您在社交场合中通常感到精力充沛",                        
+            "您更可能批评别人而不是鼓励他们",                        
+            "您的工作空间通常整洁有序",                             
+            "您会首先注意到房间里的家具摆放细节而不是整体风格",                       
+            "您喜欢成为关注的焦点",                                 
+            "您在做决定时更注重客观标准而非个人考虑",                   
+            "您喜欢按部就班而不是即兴发挥",                        
+            "您更信任经过验证的方法而不是新想法",                    
+            "您认为自己是外向而非内向的人",                        
+            "您更看重正义而不是仁慈",                               
+            "您喜欢提前制定详细的计划",                             
+            "您更倾向于使用已知的解决方案而不是尝试新方法",         
+            "当朋友情绪低落时，您更倾向于提供解决方案而不是情感安慰", 
+            "面对突发的工作变更，您会立即调整计划而不是坚持原方案",   
+            "阅读说明书时，您会仔细检查每个步骤而不是大致浏览",       
+            "在压力下，您更倾向于独自思考而不是找人讨论",            
+            "学习新技能时，您更喜欢实践操作而不是先学习理论",        
+            "您认为保持和谐比坚持真理更重要",                      
+            "您通常会提前完成工作而不是等到最后期限",               
+            "您更容易理解比喻和象征意义而不是字面描述"                  
         ];
         
         // MBTI人格类型描述和图片
@@ -559,28 +568,70 @@
         }
         
         function calculateResult() {
-            // 简化的MBTI计算逻辑
-            // E/I维度 (问题0,4,8,12,16)
-            const eiScore = (answers[0] + answers[4] + answers[8] + answers[12] + answers[16]) / 5;
-            const eiType = eiScore < 2.5 ? "I" : "E";
-            
-            // S/N维度 (问题3,7,11,15,19)
-            const snScore = (answers[3] + answers[7] + answers[11] + answers[15] + answers[19]) / 5;
+            // ==================== 维度题目分配 ====================
+            // 原20题索引保持不变，新增8题索引为20-27
+            const dimensionMap = {
+                // E/I维度：原5题 + 新增21(社交)、24(压力) → 共7题
+                EI: [0, 4, 8, 12, 16, 20, 23],
+                // S/N维度：原5题 + 新增22(细节)、27(抽象) → 共7题
+                SN: [3, 7, 11, 15, 19, 21, 26],
+                // T/F维度：原5题 + 新增25(价值观)、新增17(原题保留) → 共7题
+                TF: [1, 5, 9, 13, 17, 24, 25], 
+                // J/P维度：原5题 + 新增18(原题)、新增27(时间) → 共7题
+                JP: [2, 6, 10, 14, 18, 22, 27]
+            };
+
+            // ==================== 计分逻辑升级 ====================
+            const calculateDimensionScore = (indices) => {
+                let sum = 0;
+                const reverseScoring = [20, 21, 23]; // 需要反向计分的题号
+        
+                indices.forEach(index => {
+                    let answer = answers[index];
+                    // 对特定题目反向计分（"完全符合"计1分而非5分）
+                    if (reverseScoring.includes(index)) {
+                        answer = 6 - answer; // 5级量表反转：1⇄5, 2⇄4
+                    }
+                sum += answer;
+                });
+        
+                return sum / indices.length;
+            };
+
+            // ==================== 维度计算 ====================
+            const eiScore = calculateDimensionScore(dimensionMap.EI);
+            const snScore = calculateDimensionScore(dimensionMap.SN);
+            const tfScore = calculateDimensionScore(dimensionMap.TF);
+            const jpScore = calculateDimensionScore(dimensionMap.JP);
+
+            // ==================== 类型判断 ====================
+            const eiType = eiScore < 2.5 ? "I" : "E";  // 阈值保持2.5（7题总分17.5，平均2.5）
             const snType = snScore < 2.5 ? "S" : "N";
-            
-            // T/F维度 (问题1,5,9,13,17)
-            const tfScore = (answers[1] + answers[5] + answers[9] + answers[13] + answers[17]) / 5;
             const tfType = tfScore < 2.5 ? "T" : "F";
-            
-            // J/P维度 (问题2,6,10,14,18)
-            const jpScore = (answers[2] + answers[6] + answers[10] + answers[14] + answers[18]) / 5;
             const jpType = jpScore < 2.5 ? "J" : "P";
-            
+
             const mbtiType = eiType + snType + tfType + jpType;
-            
-            // 显示结果
+
+            // ==================== 可信度分析 ====================
+            const consistency = calculateConsistency(dimensionMap);
+            console.log(`测试可信度: ${consistency}%`);
+
+            // 显示结果（可添加consistency参数用于界面显示）
             showResult(mbtiType);
         }
+
+        // ==================== 新增辅助函数 ====================
+        function calculateConsistency(dimensionMap) {
+            // 检查每个维度内部答题一致性
+            const dimensionConsistencies = Object.values(dimensionMap).map(indices => {
+                const avg = indices.reduce((sum, i) => sum + answers[i], 0) / indices.length;
+                const variance = indices.reduce((sum, i) => sum + Math.pow(answers[i] - avg, 2), 0) / indices.length;
+                return Math.max(0, 100 - Math.sqrt(variance) * 20); // 方差越小一致性越高
+            });
+    
+            return Math.round(dimensionConsistencies.reduce((a, b) => a + b) / 4);
+        }
+
         
         function showResult(type) {
             questionnaireSection.style.display = 'none';
