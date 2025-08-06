@@ -563,7 +563,7 @@
             // 简化的MBTI计算逻辑
             // E/I维度 (问题0,4,8,12,16)
             const eiScore = (answers[0] + answers[4] + answers[8] + answers[12] + answers[16]) / 5;
-            const eiType = eiScore < 2.5 ? "I" : "E";
+            const eiType = eiScore < 2.5 ? "E" : "I";
             
             // S/N维度 (问题3,7,11,15,19)
             const snScore = (answers[3] + answers[7] + answers[11] + answers[15] + answers[19]) / 5;
